@@ -24,7 +24,6 @@ export default function Home() {
                 <div>
                     <div className="text-xl font-medium text-black">Azure</div>
                     <p className="text-slate-500">You have a new message!</p>
-                    <FaBirthdayCake /><p className="text-slate-500">Birthday</p>
                 </div>
         </motion.div>
     </div>

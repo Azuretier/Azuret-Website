@@ -18,7 +18,7 @@ export default function Home() {
                 layout
                 key={Math.random()}
                 initial={{ opacity: 0, y: 100 }}
-                animate={isLoaded ? { opacity: 1, y: 0 }}
+                animate={isLoaded ? { opacity: 1, y: 0 } : {} }
                 exit={{ opacity: 0 }}
                 transition={{
                 duration: 1

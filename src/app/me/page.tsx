@@ -6,8 +6,8 @@ import { motion } from "framer-motion";
 
 export default function Home() {
     return (
-        <div className="flex items-center justify-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-slate-900">
-            <AnimatePresence mode='wait'>
+        <AnimatePresence mode='wait'>
+            <div className="flex items-center justify-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-slate-900">
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -22,7 +22,7 @@ export default function Home() {
                         <p className="text-slate-500">You have a new message!</p>
                     </div>
                 </motion.div>
-            </AnimatePresence>
-        </div>
+            </div>
+        </AnimatePresence>
     );
 }

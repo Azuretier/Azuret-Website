@@ -1,5 +1,5 @@
 import c from "@/components/org/c"
 
-export default () => {
+export default function gatiiku() {
     return c
 }

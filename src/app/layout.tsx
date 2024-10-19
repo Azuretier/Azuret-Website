@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css"; //apply style
+import {StrictMode} from 'react'
 
 import Provider from './provider';
 
@@ -34,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <Provider>{children}</Provider>
+          <StrictMode><Provider>{children}</Provider></StrictMode>
         </body>
     </html>
   );

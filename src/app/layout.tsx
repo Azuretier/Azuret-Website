@@ -1,5 +1,3 @@
-'use client'
-
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css"; //apply style
@@ -29,6 +27,8 @@ export const metadata: Metadata = {
     type: 'website',
   },
 };
+
+'use client'
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const [count, setCount] = useState(0);

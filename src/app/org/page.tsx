@@ -40,7 +40,7 @@ const Main = () => {
                     </div>
                     <div className="grid grid-flow-col gap-2  justify-start">
                         <FaAngleDoubleUp/>
-                        <p>Level up enguage</p>
+                        <p>Study to get experience.</p>
                     </div>
                 </div>
             </motion.div>

@@ -99,7 +99,7 @@ const Main = () => {
           href="https://x.com/09xgg"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-blue-400 transition"
+          className="hover:text-gray-400 transition"
           title="Twitter"
         >
           <FaXTwitter size={24} />

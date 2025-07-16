@@ -5,7 +5,7 @@ import {motion} from 'framer-motion'
 import {animate} from 'framer-motion/dom'
 import {
     FaBirthdayCake,
-    FaAngleDoubleUp,
+    FaUserGraduate,
     FaPaperPlane,
 } from 'react-icons/fa'
 import Image from 'next/image'
@@ -38,8 +38,8 @@ const Main = () => {
                         <p>200X/2/18</p>  
                     </div>
                     <div className="grid grid-flow-col gap-2 justify-start">
-                    <FaAngleDoubleUp/>
-                    <p>Explore the world to experience things around</p>
+                    <FaUserGraduate/>
+                    <p>Student</p>
                     </div>
                     <div className="grid grid-flow-col gap-2 justify-start">
                     <FaPaperPlane/>

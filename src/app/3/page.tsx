@@ -66,7 +66,7 @@ const Main = () => {
       <FadeUpStagger className="grid grid-cols-12 grid-rows-6 grid-flow-row items-center justify-center h-screen bg-black">
           <motion.div
             className="grid gap-4 p-4 rounded-xl text-base font-black text-white grid-cols-1 grid-flow-row row-start-3 col-start-2 row-span-2 col-span-5"
-            initial={{ y: 20, opacity: 0 }}
+            initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0 }}
             transition={{ type: "spring" }}
             id="fadeUp"
@@ -95,16 +95,16 @@ const Main = () => {
               </div>
             </div>
           </motion.div>
-          <FadeUpCard href="https://x.com/09xgg" className="grid col-span-6 gap-3 row-start-2 col-start-6 hover:text-gray-400 transition">
+          <FadeUpCard href="https://x.com/09xgg" className="grid col-span-1 gap-3 row-start-2 col-start-6 hover:text-gray-400 transition">
             <FaXTwitter size={24} />
           </FadeUpCard>
-          <FadeUpCard href="https://github.com/Azuretier" className="grid col-span-6 gap-3 row-start-2 col-start-7 hover:text-gray-400 transition">
+          <FadeUpCard href="https://github.com/Azuretier" className="grid col-span-1 gap-3 row-start-2 col-start-7 hover:text-gray-400 transition">
             <FaGithub size={24} />
           </FadeUpCard>
-          <FadeUpCard href="https://discord.gg/XkwSarHyQm" className="grid col-span-6 gap-3 row-start-2 col-start-8 hover:text-indigo-400 transition">
+          <FadeUpCard href="https://discord.gg/XkwSarHyQm" className="grid col-span-1 gap-3 row-start-2 col-start-8 hover:text-indigo-400 transition">
             <FaDiscord size={24} />
           </FadeUpCard>
-          <FadeUpCard href="https://youtube.com/@Azuret" className="grid col-span-6 gap-3 row-start-2 col-start-9 hover:text-red-500 transition">
+          <FadeUpCard href="https://youtube.com/@Azuret" className="grid col-span-1 gap-3 row-start-2 col-start-9 hover:text-red-500 transition">
             <FaYoutube size={24} />
           </FadeUpCard>
       </FadeUpStagger>

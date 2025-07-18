@@ -109,7 +109,7 @@ const Main = () => {
             <motion.a href="https://discord.gg/XkwSarHyQm" className="fade-up grid place-items-center gap-3 row-start-4 col-start-2 col-span-2 text-indigo-400 border-2 border-black outline outline-2 outline-indigo-400 outline-offset-0 rounded-lg">
               <FaDiscord size={24} />
             </motion.a>
-            <motion.a href="https://youtube.com/@Azuret" className="fade-up grid place-items-center gap-3 row-start-4 col-start-4 col-span-2 text-red-500 border-2 border-black outline outline-2 outline-red-500 outline-offset-0 rounded-lg">
+            <motion.a href="https://youtube.com/@Azuret" className="fade-up grid place-items-center gap-3 row-start-4 col-start-4 col-span-2 text-red-500 border-2 border-black outline outline-2 outline-red-500 outline-offset-0 rounded-lg row-span-2">
               <FaYoutube size={24} />
             </motion.a>
           </div>

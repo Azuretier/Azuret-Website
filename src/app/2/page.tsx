@@ -43,7 +43,7 @@ const Main = () => {
           </div>
           <div className="flex gap-2 items-center row-start-3">
             <FaPaperPlane />
-            <span id="rotating-text">initial text</span>
+            <span id="rotatingText">initial text</span>
           </div>
         </div>
       </motion.div>

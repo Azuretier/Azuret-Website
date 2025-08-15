@@ -12,7 +12,7 @@ export default function RainEffect() {
     let camera: THREE.OrthographicCamera;
     let renderer: THREE.WebGLRenderer;
     let material: THREE.ShaderMaterial;
-    const settings = { fps: 30 };
+    let settings = { fps: 30 };
 
     async function init() {
       // Renderer
@@ -22,7 +22,7 @@ export default function RainEffect() {
 
       // Scene + Camera
       scene = new THREE.Scene();
-      camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
+      camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
       // Shader material
       material = new THREE.ShaderMaterial({
@@ -51,6 +51,12 @@ export default function RainEffect() {
           }
         `,
         fragmentShader: fragmentShader,
+      });
+
+      // Load background texture
+      new THREE.TextureLoader().load("/media/image.jpg", function (tex) {
+        material.uniforms.u_tex0_resolution.value = new THREE.Vector2(tex.image.width, tex.image.height);
+        material.uniforms.u_tex0.value = tex;
       });
 
       // Quad geometry

@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState} from "react";
 import * as THREE from "three";
 
 export default function RainEffect() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -20,7 +21,14 @@ export default function RainEffect() {
     containerRef.current.appendChild(renderer.domElement);
 
     const textureLoader = new THREE.TextureLoader();
-    const tex0 = textureLoader.load("/media/image.jpg");
+    const tex0 = textureLoader.load(
+      "/media/image.jpg", // your background image path
+      (tex) => {
+        uniforms.u_tex0.value = tex;
+        uniforms.u_tex0_resolution.value.set(tex.image.width, tex.image.height);
+        setIsLoaded(true); // mark as loaded when texture is ready
+      }
+    );
 
     // All uniforms must be defined here
     const uniforms: Record<string, any> = {
@@ -83,5 +91,15 @@ export default function RainEffect() {
     };
   }, []);
 
-  return <div ref={containerRef} />;
+  return (
+    <>
+      {/* Loading overlay */}
+      {!isLoaded && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
+          <p className="animate-pulse">Loading rain...</p>
+        </div>
+      )}
+      <div ref={containerRef} />
+    </>
+  );
 }

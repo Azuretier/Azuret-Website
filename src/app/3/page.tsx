@@ -87,18 +87,23 @@ const Main = () => {
     return () => clearTimeout(timeout)
   }, [displayedText, typing, textIndex, texts])
 
-  // Fade-up variants
+  // Fade-up variants (spring)
   const fadeUpVariant = {
     hidden: { opacity: 0, y: 50 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      transition: { delay: i * 0.15, duration: 0.8, ease: "easeOut" },
+      transition: {
+        delay: i * 0.15,
+        type: "spring",
+        stiffness: 200,
+        damping: 20,
+      },
     }),
   }
 
   return (
-    <main className="grid grid-cols-12 grid-rows-7 grid-flow-row items-center justify-center h-screen">
+    <main className="grid grid-cols-12 grid-rows-7 items-center justify-center h-screen">
       {/* Transition overlay */}
       {transitionDisplayed && (
         <div
@@ -110,7 +115,7 @@ const Main = () => {
 
       {/* Loading screen */}
       {showLoadingScreen && (
-        <div className="flex flex-col items-center gap-4 fixed inset-0 bg-black flex items-center justify-center z-50 transition-opacity duration-700">
+        <div className="flex flex-col items-center gap-4 fixed inset-0 bg-black z-50 flex items-center justify-center transition-opacity duration-700">
           <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
           <span className="text-white text-2xl">Loading...</span>
         </div>
@@ -169,61 +174,83 @@ const Main = () => {
       </motion.div>
 
       {/* Social Widgets */}
-      <div className="grid rounded-xl grid-rows-7 grid-cols-9 row-start-3 col-start-6 row-span-3 col-span-6 h-full">
-        {[
-          {
-            href: "https://x.com/09xgg",
-            icon: <FaXTwitter size={48} />,
-            label: "X",
-            sub: "@09xgg",
-            color: "bg-black text-white",
-          },
-          {
-            href: "https://github.com/Azuretier",
-            icon: <FaGithub size={48} />,
-            label: "GitHub",
-            sub: "Azuretier",
-            color: "bg-black text-white",
-          },
-          {
-            href: "#",
-            icon: <FaDiscord size={48} />,
-            label: "Discord",
-            sub: "@xykmr_only09",
-            color: "bg-[rgb(88,101,242)] text-white",
-          },
-          {
-            href: "https://youtube.com/@Azuret",
-            icon: <FaYoutube size={48} />,
-            label: "YouTube",
-            sub: "@Azuret",
-            color: "bg-white text-[rgb(255,0,0)]",
-          },
-        ].map((item, i) => (
-          <motion.a
-            key={i}
-            href={item.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="grid backdrop-blur-xl bg-[var(--widget-bg)] gap-3 p-6 border border-[var(--widget-border)] shadow-md rounded-lg"
-            variants={fadeUpVariant}
-            initial="hidden"
-            animate={fadeUpAnimationStarted ? "visible" : "hidden"}
-            custom={i + 1}
-            whileHover={{ scale: 1.1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
-            <div className={`flex h-20 w-20 items-center justify-center rounded-2xl drop-shadow-md ${item.color}`}>
-              {item.icon}
-            </div>
-            <div className="grid">
-              <p>{item.label}</p>
-              <section className="flex items-center gap-1">
-                <p className="text-sm text-gray-500">{item.sub}</p>
-              </section>
-            </div>
-          </motion.a>
-        ))}
+      <div className="grid rounded-xl grid-rows-7 grid-cols-9 row-start-3 col-start-6 row-span-3 col-span-6 h-full gap-4">
+        <motion.a
+          href="https://x.com/09xgg"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="grid backdrop-blur-xl bg-[var(--widget-bg)] gap-3 p-6 border border-[var(--widget-border)] shadow-md rounded-lg row-span-3 col-span-4"
+          variants={fadeUpVariant}
+          initial="hidden"
+          animate={fadeUpAnimationStarted ? "visible" : "hidden"}
+          custom={1}
+          whileHover={{ scale: 1.1 }}
+        >
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl text-white bg-black">
+            <FaXTwitter size={48} />
+          </div>
+          <div className="grid">
+            <p>X</p>
+            <p className="text-sm text-gray-500">@09xgg</p>
+          </div>
+        </motion.a>
+
+        <motion.a
+          href="https://github.com/Azuretier"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="grid backdrop-blur-xl bg-[var(--widget-bg)] gap-3 p-6 border border-[var(--widget-border)] shadow-md rounded-lg row-span-3 col-span-4 col-start-6"
+          variants={fadeUpVariant}
+          initial="hidden"
+          animate={fadeUpAnimationStarted ? "visible" : "hidden"}
+          custom={2}
+          whileHover={{ scale: 1.1 }}
+        >
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl text-white bg-black">
+            <FaGithub size={48} />
+          </div>
+          <div className="grid">
+            <p>GitHub</p>
+            <p className="text-sm text-gray-500">Azuretier</p>
+          </div>
+        </motion.a>
+
+        <motion.a
+          className="grid backdrop-blur-xl bg-[var(--widget-bg)] gap-3 p-6 border border-[var(--widget-border)] shadow-md rounded-lg row-span-3 col-span-4 row-start-5"
+          variants={fadeUpVariant}
+          initial="hidden"
+          animate={fadeUpAnimationStarted ? "visible" : "hidden"}
+          custom={3}
+          whileHover={{ scale: 1.1 }}
+        >
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl text-white bg-[rgb(88,101,242)] drop-shadow-md">
+            <FaDiscord size={48} />
+          </div>
+          <div className="grid">
+            <p>Discord</p>
+            <p className="text-sm text-gray-500">@xykmr_only09</p>
+          </div>
+        </motion.a>
+
+        <motion.a
+          href="https://youtube.com/@Azuret"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="grid backdrop-blur-xl bg-[var(--widget-bg)] gap-3 p-6 border border-[var(--widget-border)] shadow-md rounded-lg row-span-3 col-span-4 col-start-6 row-start-5"
+          variants={fadeUpVariant}
+          initial="hidden"
+          animate={fadeUpAnimationStarted ? "visible" : "hidden"}
+          custom={4}
+          whileHover={{ scale: 1.1 }}
+        >
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl text-[rgb(255,0,0)] bg-white drop-shadow-md">
+            <FaYoutube size={48} />
+          </div>
+          <div className="grid">
+            <p>YouTube</p>
+            <p className="text-sm text-gray-500">@Azuret</p>
+          </div>
+        </motion.a>
       </div>
 
       {/* Theme Toggle */}

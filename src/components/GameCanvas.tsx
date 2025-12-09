@@ -14,12 +14,14 @@ export function GameCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     
+    // 1. Cast context to 'any' so we can call .configure()
     const context = canvas.getContext("webgpu") as any;
-
+    
     if (context) {
       context.configure({ 
         device,
-        format: navigator.gpu.getPreferredCanvasFormat(),
+        // 2. Cast navigator to 'any' so we can access .gpu
+        format: (navigator as any).gpu.getPreferredCanvasFormat(),
         alphaMode: "premultiplied"
       });
     }

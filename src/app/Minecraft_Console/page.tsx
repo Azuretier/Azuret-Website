@@ -1,29 +1,3 @@
-"use client"
-
-import dynamic from 'next/dynamic';
-import Head from 'next/head';
-// Import the CSS module
-import '@/styles/VoxelWorld.module.css';
-
-// Dynamically import the VoxelWorld component with SSR disabled.
-// This is CRITICAL for Three.js/browser-specific code.
-const DynamicVoxelWorld = dynamic(() => import('@/components/VoxelWorld'), {
-  ssr: false,
-});
-
-export default function Home() {
-  return (
-    <>
-      <Head>
-        <title>Voxel World (Next.js/TS)</title>
-      </Head>
-      <div style={{ height: '100vh', width: '100vw', margin: 0, overflow: 'hidden', backgroundColor: '#87CEEB', userSelect: 'none' }}>
-        <DynamicVoxelWorld />
-      </div>
-    </>
-  );
-}
-
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -31,6 +5,7 @@ import { auth, db } from "@/lib/firebase";
 import { signInAnonymously, onAuthStateChanged, User } from "firebase/auth";
 import { collection, query, orderBy, getDocs, setDoc, doc } from "firebase/firestore";
 import { VoxelEngine, BlockType } from "@/lib/VoxelEngine";
+import styles from '@/styles/VoxelWorld.module.css'
 
 const BLOCK_SIZE = 10;
 const COLORS: Record<string, string> = {
@@ -199,7 +174,7 @@ export default function Home() {
 
 
   return (
-    <main className="w-screen h-screen overflow-hidden bg-black text-white font-sans select-none relative">
+    <main className="{styles.blog} w-screen h-screen overflow-hidden bg-black text-white font-sans select-none relative">
       
       {/* 3D CONTAINER */}
       <div ref={containerRef} className="absolute inset-0 z-0" />

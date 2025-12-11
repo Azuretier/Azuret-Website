@@ -1,166 +1,74 @@
-/* styles/VoxelWorld.module.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.canvasContainer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;700&display=swap');
 
-/* --- UI LAYERS --- */
-#ui-layer { 
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    pointer-events: none; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center; 
-    z-index: 10; 
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 18, 18, 18;
+  --background-end-rgb: 18, 18, 18;
 }
 
-/* Crosshair */
-#crosshair { 
-    position: absolute; 
-    top: 50%; 
-    left: 50%; 
-    width: 6px; 
-    height: 6px; 
-    background-color: white; 
-    border: 1px solid rgba(0,0,0,0.5); 
-    transform: translate(-50%, -50%); 
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+  margin: 0;
+  overflow: hidden;
+  user-select: none;
+  font-family: 'Inter', sans-serif;
 }
 
-/* Hotbar */
-#hotbar { 
-    position: absolute; 
-    bottom: 20px; 
-    left: 50%; 
-    transform: translateX(-50%); 
-    display: flex; 
-    gap: 10px; 
-    background: rgba(0, 0, 0, 0.5); 
-    padding: 10px; 
-    border-radius: 10px; 
-    pointer-events: auto; 
-}
-.slot { 
-    width: 40px; 
-    height: 40px; 
-    border: 3px solid #555; 
-    border-radius: 4px; 
-    cursor: pointer; 
-    transition: transform 0.1s; 
-    background-size: cover; 
-}
-.slot.active { 
-    border-color: #4CAF50; 
-    transform: scale(1.1); 
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.8); 
+/* --- UTILS --- */
+.flex-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.full-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.bg-dirt {
+  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+              url('https://www.transparenttextures.com/patterns/cubes.png'), 
+              #2e2e2e;
 }
 
-/* HUD Panels */
-#info-panel, #instructions { 
-    position: absolute; 
-    color: white; 
-    background: rgba(0, 0, 0, 0.7); 
-    padding: 10px; 
-    border-radius: 8px; 
-    font-size: 14px; 
-    border: 1px solid #4CAF50; 
+/* --- UI COMPONENTS --- */
+.game-btn {
+  background: #777;
+  border: 3px solid #fff;
+  color: #fff;
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  padding: 10px 30px;
+  width: 300px;
+  margin: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #333;
+  text-shadow: 2px 2px #000;
+  transition: all 0.1s;
+  text-align: center;
 }
-#info-panel { top: 10px; right: 10px; text-align: right; }
-#instructions { top: 10px; left: 10px; }
-
-/* --- MODALS (Start, Settings, Inventory) --- */
-#blocker, #settings-modal, #inventory-modal { 
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background-color: rgba(0, 0, 0, 0.85); 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    flex-direction: column; 
-    z-index: 20; 
-    pointer-events: auto; 
-    backdrop-filter: blur(5px);
-}
+.game-btn:hover:not(:disabled) { background: #888; transform: translateY(-2px); box-shadow: 0 6px 0 #333; }
+.game-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 0 0 #333; }
+.game-btn:disabled { background: #444; border-color: #666; color: #888; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-primary { background: #4CAF50; border-color: #81C784; }
+.btn-primary:hover:not(:disabled) { background: #56bb5b; }
+.btn-danger { background: #d32f2f; border-color: #ef5350; }
 
 .modal-box {
-    background: #222; 
-    padding: 40px; 
-    border-radius: 12px; 
-    border: 2px solid #4CAF50; 
-    text-align: center; 
-    color: white; 
-    width: 350px;
+  background: #333; border: 4px solid #fff; padding: 30px; text-align: center; width: 400px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
 }
 
-/* Inventory Specific Styles */
-#inventory-container {
-    width: 500px;
-    max-width: 90%;
-    background: #333;
-    border: 4px solid #888;
-    border-radius: 8px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.spinner {
+  border: 8px solid #333; border-top: 8px solid #4CAF50;
+  border-radius: 50%; width: 60px; height: 60px;
+  animation: spin 1s linear infinite; margin-bottom: 20px;
 }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-#inventory-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 15px;
-    margin-top: 20px;
-    width: 100%;
+.world-row {
+  background: #444; border: 2px solid #555; margin-bottom: 8px; padding: 10px 20px;
+  display: flex; justify-content: space-between; align-items: center; cursor: pointer;
 }
+.world-row:hover { background: #555; border-color: white; }
+.world-row.selected { background: #2E7D32; border-color: #4CAF50; }
 
-.inv-item {
-    width: 60px;
-    height: 60px;
-    border: 2px solid #555;
-    background-color: #444;
-    cursor: pointer;
-    position: relative;
-    transition: transform 0.1s, border-color 0.1s;
-}
-
-.inv-item:hover { transform: scale(1.05); border-color: white; }
-
-.inv-item-label {
-    position: absolute;
-    bottom: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 12px;
-    color: #ddd;
-    white-space: nowrap;
-}
-
-/* Inputs & Buttons */
-.btn-green { 
-    font-size: 16px; 
-    padding: 10px 20px; 
-    background: #4CAF50; 
-    color: white; 
-    border: none; 
-    border-radius: 5px; 
-    cursor: pointer; 
-    margin-top: 20px; 
-    transition: background 0.2s;
-}
-.btn-green:hover { background: #45a049; }
-.btn-green:disabled { background: #555; cursor: not-allowed; }
-
-.setting-row { margin: 20px 0; text-align: left; }
-label { display: block; margin-bottom: 10px; font-weight: bold; }
-input[type=range] { width: 100%; cursor: pointer; }
+.slot { width: 48px; height: 48px; border: 3px solid #555; background: #333; cursor: pointer; transition: transform 0.1s; }
+.slot.active { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 10px rgba(255,255,255,0.5); }

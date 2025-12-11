@@ -15,8 +15,13 @@ const COLORS: Record<string, string> = {
 };
 const HOTBAR_ITEMS: BlockType[] = ['grass', 'dirt', 'stone', 'wood', 'brick', 'leaves', 'water', 'obsidian'];
 
-// Fixed Splash Text from Image
 const FIXED_SPLASH = "Music by C418!";
+const TIPS = [
+  "Make some torches to light up areas at night.", "Obsidian needs a diamond pickaxe.",
+  "Press 'E' to view inventory.", "Don't dig straight down!",
+  "Water and lava are dangerous.", "Crops grow faster near water.",
+  "Wolves can be tamed with bones.", "Shift-click to move items quickly."
+];
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
@@ -26,11 +31,13 @@ export default function Home() {
   const [modalCreate, setModalCreate] = useState(false);
   const [newWorldName, setNewWorldName] = useState("New World");
   
-  // Loading State
+  // Loading
   const [loadingStatus, setLoadingStatus] = useState("Initializing server");
+  const [loadingSub, setLoadingSub] = useState("Loading spawn area...");
   const [progress, setProgress] = useState(0);
+  const [currentTip, setCurrentTip] = useState("");
 
-  // Game State
+  // Game
   const [showPreGame, setShowPreGame] = useState(false);
   const [paused, setPaused] = useState(false);
   const [coords, setCoords] = useState("0, 0, 0");
@@ -50,13 +57,16 @@ export default function Home() {
   const startLoadingSequence = (callback: () => void) => {
     setView('loading');
     setProgress(0);
+    setCurrentTip(TIPS[Math.floor(Math.random() * TIPS.length)]);
     setLoadingStatus("Initializing server");
+    setLoadingSub("Connecting to database...");
 
-    setTimeout(() => { setProgress(20); setLoadingStatus("Finding Seed for the World Generator..."); }, 500);
-    setTimeout(() => { setProgress(50); setLoadingStatus("Generating World..."); }, 1500);
-    setTimeout(() => { setProgress(100); setLoadingStatus("Loading..."); }, 3500);
+    setTimeout(() => { setProgress(20); setLoadingSub("Finding Seed for the World Generator..."); }, 500);
+    setTimeout(() => { setProgress(50); setLoadingStatus("Generating World"); setLoadingSub("Building terrain..."); }, 1500);
+    setTimeout(() => { setProgress(80); setLoadingSub("Spawning entities..."); }, 3000);
+    setTimeout(() => { setProgress(100); setLoadingStatus("Loading"); setLoadingSub("Finalizing..."); }, 4500);
     
-    setTimeout(() => { callback(); }, 4000);
+    setTimeout(() => { callback(); }, 5000);
   };
 
   const fetchWorlds = async () => {
@@ -72,13 +82,11 @@ export default function Home() {
   const createWorld = async () => {
     if (!user || !newWorldName.trim()) return;
     setModalCreate(false);
-    
     startLoadingSequence(async () => {
         try {
             const newId = `world_${Date.now()}`;
             const basePath = `artifacts/${process.env.NEXT_PUBLIC_FIREBASE_APP_ID}/users/${user.uid}/worlds`;
             await setDoc(doc(db, basePath, newId), { name: newWorldName, createdBy: user.uid, createdAt: Date.now() });
-
             const promises = [];
             for(let x=-8; x<8; x++){
                 for(let z=-8; z<8; z++){
@@ -157,35 +165,42 @@ export default function Home() {
 
       {/* --- TITLE SCREEN (NINTENDO SWITCH STYLE) --- */}
       {view === 'title' && (
-        <div className={`${styles.fullScreen} ${styles.flexCenter} ${styles.bgPanorama}`}>
-          
-          <div className={styles.logoContainer}>
-            <h1 className={styles.logoMain}>MINECRAFT</h1>
-            <div className={styles.logoSub}>NINTENDO SWITCH EDITION</div>
-            <div className={styles.splashText}>{FIXED_SPLASH}</div>
-          </div>
+        <div className={styles.fullScreen}>
+          {/* Background Layer (Blurred & Scaled) */}
+          <div className={styles.panorama}></div>
 
-          <div className={styles.menuContainer}>
-            <button disabled={!user} onClick={fetchWorlds} className={styles.switchBtn}>Play Game</button>
-            <button className={styles.switchBtn}>Mini Games</button>
-            <button className={styles.switchBtn}>Achievements</button>
-            <button className={styles.switchBtn}>Help & Options</button>
-            <button className={styles.switchBtn}>Minecraft Store</button>
+          {/* Content Layer (Sharp) */}
+          <div className={styles.menuLayer}>
             
-            <button className={`${styles.switchBtn} ${styles.downloadBtn}`}>
-                Download the latest version of Minecraft<br/>for FREE!
-            </button>
-          </div>
+            <div className={styles.logoContainer}>
+              <h1 className={styles.logoMain}>MINECRAFT</h1>
+              <div className={styles.logoSub}>NINTENDO SWITCH EDITION</div>
+              <div className={styles.splashText}>{FIXED_SPLASH}</div>
+            </div>
 
-          <div className={styles.footerBar}>
-            <div className={styles.footerItem}>
-              <div className={styles.btnIcon} style={{background:'#444', color:'#fff'}}>A</div>
-              <span>Select</span>
+            <div className={styles.menuContainer}>
+              <button disabled={!user} onClick={fetchWorlds} className={styles.switchBtn}>Play Game</button>
+              <button className={styles.switchBtn}>Mini Games</button>
+              <button className={styles.switchBtn}>Achievements</button>
+              <button className={styles.switchBtn}>Help & Options</button>
+              <button className={styles.switchBtn}>Minecraft Store</button>
+              
+              <button className={`${styles.switchBtn} ${styles.downloadBtn}`}>
+                  Download the latest version of Minecraft<br/>for FREE!
+              </button>
             </div>
-            <div className={styles.footerItem}>
-              <div className={styles.btnIcon} style={{background:'#444', color:'#fff'}}>Y</div>
-              <span>Change Network Mode</span>
+
+            <div className={styles.footerBar}>
+              <div className={styles.footerItem}>
+                <div className={styles.btnIcon} style={{background:'#444', color:'#fff'}}>A</div>
+                <span>Select</span>
+              </div>
+              <div className={styles.footerItem}>
+                <div className={styles.btnIcon} style={{background:'#444', color:'#fff'}}>Y</div>
+                <span>Change Network Mode</span>
+              </div>
             </div>
+
           </div>
         </div>
       )}
@@ -194,34 +209,42 @@ export default function Home() {
       {view === 'loading' && (
         <div className={`${styles.fullScreen} ${styles.loadingScreen}`}>
           <div className={styles.loadingOverlay}>
-            <div style={{fontSize:'2rem', marginBottom:'10px'}}>{loadingStatus}</div>
-            <div className={styles.progressTrack}>
-                <div className={styles.progressFill} style={{ width: `${progress}%` }}></div>
+            <h1 className={styles.loadingLogo}>MINECRAFT</h1>
+            <div className={styles.loadingCenter}>
+                <div className={styles.loadingStatus}>{loadingStatus}</div>
+                <div className={styles.loadingSubText}>{loadingSub}</div>
+                <div className={styles.progressTrack}>
+                    <div className={styles.progressFill} style={{ width: `${progress}%` }}></div>
+                </div>
             </div>
+            <div className={styles.tipBox}>{currentTip}</div>
           </div>
         </div>
       )}
 
       {/* --- WORLD SELECT --- */}
       {view === 'worlds' && (
-        <div className={`${styles.fullScreen} ${styles.flexCenter} ${styles.bgPanorama}`}>
-          <h1 className={styles.logoMain} style={{fontSize: '4rem'}}>SELECT WORLD</h1>
-          <div className={styles.listContainer}>
-            {worlds.length === 0 && <div style={{textAlign:'center', marginTop: 100, color:'#888', fontFamily: 'var(--font-pixel)', fontSize: '1.5rem'}}>No worlds created yet.</div>}
-            {worlds.map(w => (
-              <div key={w.id} 
-                   onClick={() => setSelectedWorldId(w.id)}
-                   className={`${styles.worldRow} ${selectedWorldId === w.id ? styles.worldRowSelected : ''}`}>
-                <span>{w.name}</span>
-                <span style={{fontSize: '0.8rem', color:'#aaa'}}>{new Date(w.createdAt).toLocaleDateString()}</span>
-              </div>
-            ))}
+        <div className={styles.fullScreen}>
+          <div className={styles.panorama}></div>
+          <div className={styles.menuLayer}>
+            <h1 className={styles.logoMain} style={{fontSize: '4rem', marginTop: 20}}>SELECT WORLD</h1>
+            <div className={styles.listContainer}>
+              {worlds.length === 0 && <div style={{textAlign:'center', marginTop: 100, color:'#888', fontFamily: 'var(--font-pixel)', fontSize: '1.5rem'}}>No worlds created yet.</div>}
+              {worlds.map(w => (
+                <div key={w.id} 
+                    onClick={() => setSelectedWorldId(w.id)}
+                    className={`${styles.worldRow} ${selectedWorldId === w.id ? styles.worldRowSelected : ''}`}>
+                  <span>{w.name}</span>
+                  <span style={{fontSize: '0.8rem', color:'#aaa'}}>{new Date(w.createdAt).toLocaleDateString()}</span>
+                </div>
+              ))}
+            </div>
+            <div className={styles.row}>
+              <button onClick={() => setModalCreate(true)} className={styles.switchBtn} style={{width:'200px'}}>Create New</button>
+              <button disabled={!selectedWorldId} onClick={() => loadGame(selectedWorldId!)} className={styles.switchBtn} style={{width:'200px'}}>Load</button>
+            </div>
+            <button onClick={() => setView('title')} className={styles.switchBtn} style={{width:'200px', marginTop:20}}>Back</button>
           </div>
-          <div className={styles.row}>
-            <button onClick={() => setModalCreate(true)} className={styles.switchBtn} style={{width:'200px'}}>Create New</button>
-            <button disabled={!selectedWorldId} onClick={() => loadGame(selectedWorldId!)} className={styles.switchBtn} style={{width:'200px'}}>Load</button>
-          </div>
-          <button onClick={() => setView('title')} className={styles.switchBtn} style={{width:'200px', marginTop:20}}>Back</button>
         </div>
       )}
 

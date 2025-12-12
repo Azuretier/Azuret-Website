@@ -28,14 +28,11 @@
   width: 120%;
   height: 120%;
   
-  /* PRIORITY 1: Local Image in public/ folder */
-  background-image: url('/panorama.jpg');
+  /* UPDATED PATH: Points to public/media/panorama.png */
+  background-image: url('/media/panorama.png');
   
-  /* PRIORITY 2: External Backup (If local fails) */
-  background-image: url('/panorama.jpg'), url('https://assets.codepen.io/104338/minecraft-panorama.jpg');
-  
-  /* PRIORITY 3: CSS Fallback (Sky Blue) if no images load */
-  background-color: #5b87e5; 
+  /* Fallback to external if local fails, then color */
+  background-image: url('/media/panorama.png'), url('https://assets.codepen.io/104338/minecraft-panorama.jpg');
   
   background-repeat: no-repeat;
   background-position: center center;
@@ -138,6 +135,12 @@
   text-align: center;
   animation: splashAnim 0.6s infinite alternate;
   z-index: 70;
+}
+
+@keyframes splashAnim {
+  0% { transform: scale(1) rotate(-20deg); }
+  50% { transform: scale(1.05) rotate(-20deg); }
+  100% { transform: scale(1) rotate(-20deg); }
 }
 
 /* --- MENU BUTTONS --- */
@@ -246,8 +249,12 @@
 .row { display: flex; gap: 10px; justify-content: center; }
 
 /* --- LOADING --- */
-.loadingScreen { z-index: 100; background: #222; }
-/* Loading uses the same panorama class, just ensure it's visible */
+.loadingScreen { 
+  z-index: 100; 
+  /* UPDATED PATH HERE TOO */
+  background: url('/media/panorama.png') no-repeat center center fixed; 
+  background-size: cover; 
+}
 .loadingOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-shadow: 2px 2px 0 #000; font-family: var(--font-pixel); }
 .loadingLogo { font-family: var(--font-pixel); font-size: 4rem; color: #fff; text-shadow: 4px 4px 0 #333; margin-top: 20px; }
 .loadingCenter { width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; }

@@ -1,7 +1,7 @@
 // src/data.ts
 
 export const USER_DATA = {
-  name: "Your Name",
+  name: "Azure",
   title: "Freelance Creative & Developer",
   bio: "Building digital products that combine clean code with exceptional user experience. Currently focused on freelance projects and open-source.",
   email: "hello@yourname.com",
@@ -18,7 +18,7 @@ export const USER_DATA = {
     },
     { 
       name: "Instagram", 
-      href: "https://www.instagram.com/rrrrrrrrrrvq/", 
+      href: "https://www.instagram.com/rrrrrrrrrrvq", 
       type: "link" 
     },
     { 

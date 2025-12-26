@@ -181,20 +181,20 @@ const Main = () => {
 
 const SnsWidget = ({ href, icon: Icon, label, username, gradient, isStatic }: any) => {
   const content = (
-    <div className={`${INNER_RADIUS} bg-[var(--widget-bg)] backdrop-blur-md p-6 h-full flex flex-col justify-center gap-4`}>
-        <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-lg bg-gradient-to-br ${gradient}`}>
+    <div className="bg-[var(--widget-bg)] backdrop-blur-md rounded-[11px] p-6 h-full flex flex-col justify-center gap-3">
+        <div className={`flex h-16 w-16 items-center justify-center rounded-2xl text-white shadow-lg bg-gradient-to-br ${gradient}`}>
           <Icon size={28} />
         </div>
         <div>
-          <p className="font-black text-xl tracking-tight leading-none mb-1">{label}</p>
-          <p className="text-xs text-gray-500 font-bold">{username}</p>
+          <p className="font-black text-lg">{label}</p>
+          <p className="text-sm text-gray-500">{username}</p>
         </div>
     </div>
   );
 
   return (
-    <div className={`${BORDER_SIZE} ${OUTER_RADIUS} bg-gradient-to-br ${gradient} hover:scale-[1.02] transition-all cursor-pointer shadow-xl h-full w-full`}>
-      {isStatic ? content : <a href={href} target="_blank" rel="noopener noreferrer" className="block h-full w-full">{content}</a>}
+    <div className={`p-[1.5px] rounded-xl bg-gradient-to-br ${gradient} opacity-90 hover:opacity-100 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer`}>
+      {isStatic ? content : <a href={href} target="_blank" rel="noopener noreferrer" className="block h-full">{content}</a>}
     </div>
   );
 };

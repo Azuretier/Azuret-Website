@@ -180,9 +180,35 @@ const Main = () => {
 // --- SUB-COMPONENTS (ROBUST BORDERS) ---
 
 const SnsWidget = ({ href, icon: Icon, label, username, isStatic }: any) => {
+
+  const brandStyles: Record<string, { icon: string; bg: string }> = {
+    youtube: { 
+      icon: "bg-youtube-icon", 
+      bg: "bg-youtube-bg" 
+    },
+    github: { 
+      icon: "bg-github-icon", 
+      bg: "bg-github-bg" 
+    },
+    instagram: { 
+      icon: "bg-instagram-icon", 
+      bg: "bg-instagram-bg" 
+    },
+    discord: { 
+      icon: "bg-discord-icon", 
+      bg: "bg-discord-bg" 
+    },
+  };
+
+  // 2. Fallback logic
+  const activeBrand = brandStyles[label.toLowerCase()] || { 
+    icon: "bg-gray-500", 
+    bg: "bg-gray-200" 
+  };
+
   const content = (
     <div className={`${INNER_RADIUS} bg-[var(--widget-bg)] backdrop-blur-md p-6 h-full flex flex-col justify-center gap-3`}>
-        <div className={`flex h-16 w-16 items-center justify-center rounded-2xl text-white shadow-lg ${"bg-" + label.toLowerCase() + "-icon"}`}>
+        <div className={`flex h-16 w-16 items-center justify-center rounded-2xl text-white shadow-lg ${activeBrand.icon}`}>
           <Icon size={32} />
         </div>
         <div>
@@ -193,7 +219,7 @@ const SnsWidget = ({ href, icon: Icon, label, username, isStatic }: any) => {
   );
 
   return (
-    <div className={`${BORDER_SIZE} ${OUTER_RADIUS} ${"bg-" + label.toLowerCase() + "-bg"} opacity-90 hover:opacity-100 transition-all cursor-pointer`}>
+    <div className={`${BORDER_SIZE} ${OUTER_RADIUS} ${activeBrand.bg} opacity-90 hover:opacity-100 transition-all cursor-pointer`}>
       {isStatic ? content : <a href={href} target="_blank" rel="noopener noreferrer" className="block h-full">{content}</a>}
     </div>
   );

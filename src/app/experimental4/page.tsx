@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useState, createContext, useContext, useRef, useCallback, memo } from "react"
+import { useEffect, useState, createContext, useContext, useRef, useCallback, memo, useMemo, use } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import { Disc3, MessageSquare } from "lucide-react"
 import { db } from "@/lib/portfolio/firebase";
 import { auth } from "@/lib/portfolio/firebase";
-import { Cake, GraduationCap, Send, Folder, Share2, ChevronRight, Star, Github, Youtube, Instagram, MessageCircle, Sun, Moon, MapPin, Mail, Globe, Sparkles, TrendingUp, Clock, ExternalLink, User as UserIcon, BarChart3, Terminal, Settings, X, Minimize2, Maximize2, FolderOpen, Image as ImageIcon, Music, Film, BookOpen, Bot, Command, Zap, Shield, Heart, Code, HelpCircle, ChevronDown, ChevronUp, Copy, Check, ArrowLeft, Layers, Server, Database, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Battery, BatteryCharging, Cpu, HardDrive, Thermometer,Users, Hash, Mic, Headphones, AtSign, Send as SendIcon, Smile, Paperclip, PenSquare, Calendar, Tag, Eye, ThumbsUp, MessageSquare as CommentIcon, Rss, Bookmark, MoreHorizontal, Wifi, Bluetooth, Monitor, Activity, Zap as ZapIcon } from "lucide-react"
+import { Cake, GraduationCap, Send, Folder, Share2, ChevronRight, Star, Github, Youtube, Instagram, MessageCircle, Sun, Moon, MapPin, Mail, Globe, Sparkles, TrendingUp, Clock as ClockIcon, ExternalLink, User as UserIcon, BarChart3, Terminal, Settings, X, Minimize2, Maximize2, FolderOpen, Image as ImageIcon, Music, Film, BookOpen, Bot, Command, Zap, Shield, Heart, Code, HelpCircle, ChevronDown, ChevronUp, Copy, Check, ArrowLeft, Layers, Server, Database, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Battery, BatteryCharging, Cpu, HardDrive, Thermometer,Users, Hash, Mic, Headphones, AtSign, Send as SendIcon, Smile, Paperclip, PenSquare, Calendar, Tag, Eye, ThumbsUp, MessageSquare as CommentIcon, Rss, Bookmark, MoreHorizontal, Wifi, Bluetooth, Monitor, Activity, Zap as ZapIcon } from "lucide-react"
 import RainEffect from '@/components/main/realistic-rain';
 import { signInAnonymously, onAuthStateChanged, User } from "firebase/auth";
 import { TerminalLineType, TRANSLATIONS, SNS_LINKS, MUSIC_TRACKS, THEMES, PROFILE_INFO, DISCORD_SERVERS, PROJECTS, VISITOR_DATA, NEWS_HEADLINES, AZURE_DOCS, BLOG_POSTS, TERMINAL_COMMANDS } from "@/components/portfolio/data";
@@ -60,7 +60,6 @@ const Main = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const [time, setTime] = useState(new Date());
 
   const [openWindows, setOpenWindows] = useState<string[]>([]); // Acts as our Z-index stack
   const [activeWindow, setActiveWindow] = useState<string | null>(null);
@@ -71,7 +70,10 @@ const Main = () => {
 
   // Store window positions to prevent teleporting
 
-  const currentTheme = THEMES[theme as keyof typeof THEMES] || THEMES.purple;
+  const currentTheme = useMemo(() => 
+    THEMES[theme as keyof typeof THEMES] || THEMES.purple,
+    [theme]
+  );
 
   // Translation function
   const t = (key: string): string => {
@@ -138,11 +140,6 @@ const loadSettings = useCallback(async () => {
       loadSettings();
     }
   }, [user, loadSettings]);
-
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     const newsInterval = setInterval(() => {
@@ -263,6 +260,114 @@ const loadSettings = useCallback(async () => {
     { id: 'terminal', icon: Terminal, label: t('terminal'), color: 'bg-gray-700' },
     { id: 'settings', icon: Settings, label: t('settings'), color: 'bg-red-500' },
   ];
+
+  // Create a separate Clock component
+const Clock = memo(({ isDarkMode, textClass }: { isDarkMode: boolean; textClass: string }) => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -50 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: 0.3 }}
+      className={textClass}
+    >
+      <div className="text-8xl font-bold tracking-tighter leading-none drop-shadow-2xl">
+        {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
+      </div>
+      <div className="text-2xl font-medium mt-2 opacity-90">
+        {time.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: '2-digit' })}
+      </div>
+    </motion.div>
+  );
+});
+
+Clock.displayName = 'Clock';
+
+// Create a separate TaskbarClock component
+const TaskbarClock = memo(({ isDarkMode }: { isDarkMode: boolean }) => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="flex items-center gap-4">
+      <div className={`${isDarkMode ? 'text-white' : 'text-slate-700'} text-sm font-mono`}>
+        {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+      </div>
+      <div className={`${isDarkMode ? 'text-white/60' : 'text-slate-500'} text-xs`}>
+        {time.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+      </div>
+    </div>
+  );
+});
+
+TaskbarClock.displayName = 'TaskbarClock';
+
+const NewsTicker = memo(({ 
+  isDarkMode, 
+  newsSpeed, 
+  theme 
+}: { 
+  isDarkMode: boolean; 
+  newsSpeed: number; 
+  theme: any;
+}) => {
+  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
+
+  useEffect(() => {
+    const newsInterval = setInterval(() => {
+      setCurrentNewsIndex((prev) => (prev + 1) % NEWS_HEADLINES.length);
+    }, newsSpeed * 1000);
+    return () => clearInterval(newsInterval);
+  }, [newsSpeed]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5 }}
+      className={`${isDarkMode ? 'bg-black/30' : 'bg-white/70'} backdrop-blur-md border ${isDarkMode ? 'border-white/10' : 'border-slate-200'} rounded-xl p-4 w-[500px] h-[100px]`}
+    >
+      <div className="h-[52px] overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={currentNewsIndex}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className={`${isDarkMode ? 'text-white/90' : 'text-slate-700'} text-sm leading-relaxed line-clamp-2`}
+          >
+            {NEWS_HEADLINES[currentNewsIndex]}
+          </motion.p>
+        </AnimatePresence>
+      </div>
+      
+      <div className="flex gap-2 mt-3">
+        {NEWS_HEADLINES.map((_, i) => (
+          <div
+            key={i}
+            className={`h-2 rounded-full transition-all ${
+              i === currentNewsIndex 
+                ? `bg-gradient-to-r ${theme.gradient} w-6` 
+                : `${isDarkMode ? 'bg-white/30' : 'bg-slate-300'} w-2`
+            }`}
+          />
+        ))}
+      </div>
+    </motion.div>
+  );
+});
+
+NewsTicker.displayName = 'NewsTicker';
 
   const MusicPlayerWindow = memo(({ theme, isDarkMode }: { theme: any; isDarkMode: boolean }) => {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -863,7 +968,7 @@ const loadSettings = useCallback(async () => {
                             {post.date}
                           </span>
                           <span className={`flex items-center gap-1 text-sm ${isDarkMode ? 'text-white/50' : 'text-slate-400'}`}>
-                            <Clock size={14} />
+                            <ClockIcon size={14} />
                             {post.readTime}
                           </span>
                         </div>
@@ -1215,56 +1320,8 @@ const loadSettings = useCallback(async () => {
 
         {/* Clock and News Overlay */}
         <div className="absolute top-96 left-16 z-10 space-y-4">
-          {/* Large Clock */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className={textClass}
-          >
-            <div className="text-8xl font-bold tracking-tighter leading-none drop-shadow-2xl">
-              {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
-            </div>
-            <div className="text-2xl font-medium mt-2 opacity-90">
-              {time.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: '2-digit' })}
-            </div>
-          </motion.div>
-
-          {/* News Ticker - Fixed height */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className={`${isDarkMode ? 'bg-black/30' : 'bg-white/70'} backdrop-blur-md border ${isDarkMode ? 'border-white/10' : 'border-slate-200'} rounded-xl p-4 w-[500px] h-[100px]`}
-          >
-            <div className="h-[52px] overflow-hidden">
-              <AnimatePresence mode="wait">
-                <motion.p
-                  key={currentNewsIndex}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className={`${isDarkMode ? 'text-white/90' : 'text-slate-700'} text-sm leading-relaxed line-clamp-2`}
-                >
-                  {NEWS_HEADLINES[currentNewsIndex]}
-                </motion.p>
-              </AnimatePresence>
-            </div>
-            
-            {/* Dots indicator */}
-            <div className="flex gap-2 mt-3">
-              {NEWS_HEADLINES.map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-2 rounded-full transition-all ${
-                    i === currentNewsIndex 
-                      ? `bg-gradient-to-r ${currentTheme.gradient} w-6` 
-                      : `${isDarkMode ? 'bg-white/30' : 'bg-slate-300'} w-2`
-                  }`}
-                />
-              ))}
-            </div>
-          </motion.div>
+          <Clock isDarkMode={isDarkMode} textClass={isDarkMode ? 'text-white' : 'text-slate-900'} />
+          <NewsTicker isDarkMode={isDarkMode} newsSpeed={newsSpeed} theme={currentTheme} />
         </div>
 
         {/* Desktop Icons - Windows-style Grid Layout */}
@@ -1305,10 +1362,10 @@ const loadSettings = useCallback(async () => {
 
             switch (windowId) {
               case 'profile':
-                content = <ProfileWindow theme={currentTheme} isDarkMode={isDarkMode} t={t} />;
+                content = useMemo(() => (<ProfileWindow theme={currentTheme} isDarkMode={isDarkMode} t={t} />), [currentTheme, isDarkMode, t]);
                 break;
               case 'social':
-                content = (
+                content = useMemo(() => (
                   <div className="relative h-[500px] flex items-center justify-center pt-4" onWheel={handleSnsScroll}>
                     {SNS_LINKS.map((sns, index) => {
                       const offset = index - selectedSns;
@@ -1332,11 +1389,11 @@ const loadSettings = useCallback(async () => {
                       );
                     })}
                   </div>
-                );
+                ), [selectedSns]);
                 break;
               case 'projects':
                 title = t('projects');
-                content = (
+                content = useMemo(() => (
                   <div 
                     className="relative h-[500px] flex items-center justify-center pt-4" 
                     onWheel={handleProjectScroll}
@@ -1364,39 +1421,39 @@ const loadSettings = useCallback(async () => {
                       );
                     })}
                   </div>
-                );
+                ), [selectedProject]);
                 break;
               case 'analytics':
-                content = <AnalyticsWindow theme={currentTheme} isDarkMode={isDarkMode} t={t} />;
+                content = useMemo(() => (<AnalyticsWindow theme={currentTheme} isDarkMode={isDarkMode} t={t} />), [currentTheme, isDarkMode, t]);
                 break;
               case 'azure-docs':
                 title = "Azure Supporter Documentation";
-                content = <AzureDocsWindow theme={currentTheme} isDarkMode={isDarkMode} />;
+                content = useMemo(() => (<AzureDocsWindow theme={currentTheme} isDarkMode={isDarkMode} />), [currentTheme, isDarkMode]);
                 isLarge = true;
                 break;
               case 'music':
                 title = "Music Player";
-                content = <MusicPlayerWindow theme={currentTheme} isDarkMode={isDarkMode} />;
+                content = useMemo(() => (<MusicPlayerWindow theme={currentTheme} isDarkMode={isDarkMode} />), [currentTheme, isDarkMode]);
                 isScrollable = true;
                 break;
 
               case 'discord':
                 title = "Discord";
-                content = <DiscordWindow theme={currentTheme} isDarkMode={isDarkMode} />;
+                content = useMemo(() => (<DiscordWindow theme={currentTheme} isDarkMode={isDarkMode} />), [currentTheme, isDarkMode]);
                 isScrollable = true;
                 break;
               case 'live-chat':
                 title = "Live Chat";
-                content = <LiveChatWindow theme={currentTheme} isDarkMode={isDarkMode} />;
+                content = useMemo(() => (<LiveChatWindow theme={currentTheme} isDarkMode={isDarkMode} />), [currentTheme, isDarkMode]);
               case 'blog':
-                content = <BlogWindow theme={currentTheme} isDarkMode={isDarkMode} />;
+                content = useMemo(() => (<BlogWindow theme={currentTheme} isDarkMode={isDarkMode} />), [currentTheme, isDarkMode]);
                 isScrollable = true;
                 break;
               case 'terminal':
-                content = <TerminalWindow />;
+                content = useMemo(() => (<TerminalWindow />), []);
                 break;
               case 'settings':
-                content = <SettingsWindow theme={currentTheme} />;
+                content = useMemo(() => (<SettingsWindow theme={currentTheme} />), [currentTheme, isDarkMode]);
                 isScrollable = true;
                 break;
               default:
@@ -1430,54 +1487,7 @@ const loadSettings = useCallback(async () => {
 
         {/* Taskbar */}
         <div className={`absolute bottom-0 left-0 right-0 h-16 ${isDarkMode ? 'bg-slate-900/95' : 'bg-white/90'} backdrop-blur-md border-t ${isDarkMode ? 'border-white/10' : 'border-slate-200'} flex items-center px-4 gap-4`}>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className={`p-3 bg-gradient-to-r ${currentTheme.gradient} rounded-lg shadow-lg`}
-          >
-            <Sparkles className="text-white" size={24} />
-          </motion.button>
-
-          <div className="flex-1 flex gap-2">
-            {openWindows.map((windowId) => {
-              const icon = desktopIcons.find(i => i.id === windowId);
-              const active = activeWindow === windowId;
-              
-              return (
-                <button
-                  key={windowId}
-                  onClick={() => {
-                    if (active) {
-                      // Optional: Minimize logic here, or just keep focus
-                    } else {
-                      setActiveWindow(windowId);
-                      // Move to end of array to bring to front
-                      setOpenWindows(prev => [...prev.filter(id => id !== windowId), windowId]);
-                    }
-                  }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                    active
-                      ? `${isDarkMode ? 'bg-white/20 border-white/30' : 'bg-slate-200 border-slate-300'} border-2`
-                      : `${isDarkMode ? 'bg-white/5 hover:bg-white/10' : 'bg-slate-100 hover:bg-slate-200'} border-2 border-transparent`
-                  }`}
-                >
-                  {icon && <icon.icon className={isDarkMode ? 'text-white' : 'text-slate-700'} size={18} />}
-                  <span className={`${isDarkMode ? 'text-white' : 'text-slate-700'} text-sm font-medium`}>
-                    {icon?.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className={`${isDarkMode ? 'text-white' : 'text-slate-700'} text-sm font-mono`}>
-              {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-            </div>
-            <div className={`${isDarkMode ? 'text-white/60' : 'text-slate-500'} text-xs`}>
-              {time.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            </div>
-          </div>
+          <TaskbarClock isDarkMode={isDarkMode} />
         </div>
       </motion.main>
     </SettingsContext.Provider>
@@ -1711,9 +1721,9 @@ const AnalyticsWindow = ({ theme, isDarkMode, t }: { theme: any; isDarkMode: boo
   <div className="space-y-6">
     <div className="grid grid-cols-2 gap-4">
       <StatCard label={t('totalVisits')} value={VISITOR_DATA.totalVisits.toLocaleString()} icon={TrendingUp} color="bg-blue-500" isDarkMode={isDarkMode} />
-      <StatCard label={t('todayVisits')} value={VISITOR_DATA.todayVisits.toLocaleString()} icon={Clock} color="bg-green-500" isDarkMode={isDarkMode} />
+      <StatCard label={t('todayVisits')} value={VISITOR_DATA.todayVisits.toLocaleString()} icon={ClockIcon} color="bg-green-500" isDarkMode={isDarkMode} />
       <StatCard label={t('uniqueVisitors')} value={VISITOR_DATA.uniqueVisitors.toLocaleString()} icon={UserIcon} color="bg-purple-500" isDarkMode={isDarkMode} />
-      <StatCard label={t('avgSession')} value={VISITOR_DATA.avgSessionTime} icon={Clock} color="bg-orange-500" isDarkMode={isDarkMode} />
+      <StatCard label={t('avgSession')} value={VISITOR_DATA.avgSessionTime} icon={ClockIcon} color="bg-orange-500" isDarkMode={isDarkMode} />
     </div>
 
     <div className={`${isDarkMode ? 'bg-slate-900/50' : 'bg-slate-100'} p-6 rounded-lg border ${isDarkMode ? 'border-white/10' : 'border-slate-200'}`}>

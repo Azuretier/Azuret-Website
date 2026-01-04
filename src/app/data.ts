@@ -22,26 +22,26 @@ export const AZURET_DATA = {
       icon: Github, 
       url: 'https://github.com/Azuretier', 
       color: 'hover:text-white',
-      username: '@Azuretier'
+      username: 'Azuretier'
     },
     { 
       name: 'YouTube', 
       icon: Youtube, 
       url: 'https://youtube.com/@azuret', 
       color: 'hover:text-red-500',
-      username: 'Azuret'
+      username: '@Azuret'
     },
     { 
       name: 'Instagram', 
       icon: Instagram, 
-      url: '#', 
+      url: 'https://www.instagram.com/rrrrrrrrrrvq', 
       color: 'hover:text-pink-500',
-      username: '@'
+      username: '@rrrrrrrrrrvq'
     },
     { 
       name: 'Discord', 
       icon: MessageSquare, 
-      url: '#', 
+      url: 'https://discord.gg/z5Q2MSFWuu', 
       color: 'hover:text-indigo-400',
       username: 'Join Community'
     },

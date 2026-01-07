@@ -1,7 +1,10 @@
 "use client";
 
+<<<<<<< HEAD
+=======
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+>>>>>>> ab38d42403fd9a813ebc12836c239f41d5b71032
 
 const roles = {
   EN: {

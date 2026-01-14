@@ -144,19 +144,21 @@ export function useGameSocket(): UseGameSocketReturn {
         }
 
         socket.emit('room:create', playerName, (response) => {
-          if (response.success) {
-            setRoomCode(response.roomCode!);
-            setRoomId(response.roomId!);
+          if (response.success && response.roomCode && response.roomId) {
+            setRoomCode(response.roomCode);
+            setRoomId(response.roomId);
             setRoomState(RoomState.LOBBY);
-            setPlayers([
-              {
-                id: socket.id!,
-                name: playerName,
-                score: 0,
-                isHost: true,
-                connected: true,
-              },
-            ]);
+            if (socket.id) {
+              setPlayers([
+                {
+                  id: socket.id,
+                  name: playerName,
+                  score: 0,
+                  isHost: true,
+                  connected: true,
+                },
+              ]);
+            }
           } else {
             setError(response.error || 'Failed to create room');
           }

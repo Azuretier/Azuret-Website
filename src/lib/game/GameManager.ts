@@ -24,7 +24,7 @@ export class GameManager {
    * Create a new game room
    */
   createRoom(hostId: string, hostName: string): { roomId: string; roomCode: string } {
-    const roomId = `room_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const roomId = `room_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
     const roomCode = this.generateRoomCode();
 
     const host: Player = {
@@ -268,7 +268,7 @@ export class GameManager {
       return { success: false, error: 'Invalid event type' };
     }
 
-    if (event.value < 0 || event.value > 1000) {
+    if (event.value < 0 || event.value > GAME_CONFIG.MAX_EVENT_VALUE) {
       return { success: false, error: 'Invalid event value' };
     }
 

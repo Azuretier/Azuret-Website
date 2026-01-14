@@ -1,6 +1,7 @@
 'use client';
 
 import { UseGameSocketReturn } from '@/hooks/useGameSocket';
+import { GAME_CONFIG } from '@/types/game';
 import { useState } from 'react';
 
 interface LobbyProps {
@@ -56,7 +57,7 @@ export default function Lobby({ gameSocket }: LobbyProps) {
       {/* Players List */}
       <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
         <h2 className="text-2xl font-bold mb-6 text-center">
-          Players ({gameSocket.players.length}/{8})
+          Players ({gameSocket.players.length}/{GAME_CONFIG.MAX_PLAYERS})
         </h2>
         <div className="space-y-3">
           {gameSocket.players.map((player) => (

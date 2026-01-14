@@ -4,10 +4,11 @@ import next from 'next';
 import { Server as SocketIOServer } from 'socket.io';
 import type { Socket } from 'socket.io';
 import { gameManager } from './src/lib/game/GameManager';
-import type {
-  ServerToClientEvents,
-  ClientToServerEvents,
-  Player,
+import {
+  GAME_CONFIG,
+  type ServerToClientEvents,
+  type ClientToServerEvents,
+  type Player,
 } from './src/types/game';
 
 const dev = process.env.NODE_ENV !== 'production';
@@ -126,7 +127,7 @@ app.prepare().then(() => {
             io.to(roomId).emit('game:started');
             io.to(roomId).emit('room:state-changed', currentRoom.state);
           }
-        }, 3000);
+        }, GAME_CONFIG.COUNTDOWN_DURATION * 1000);
 
         // Emit game finished after game duration
         setTimeout(() => {
@@ -136,7 +137,7 @@ app.prepare().then(() => {
             io.to(roomId).emit('game:finished', leaderboard);
             io.to(roomId).emit('room:state-changed', currentRoom.state);
           }
-        }, (3 + room.gameDuration) * 1000);
+        }, (GAME_CONFIG.COUNTDOWN_DURATION + room.gameDuration) * 1000);
 
         console.log(`Game started in room ${roomId}`);
       } catch (error) {

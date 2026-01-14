@@ -12,112 +12,104 @@ interface RankCardProps {
   displayName: string;
   level: number;
   xp: number;
-  rankName?: string | null;
-  avatarUrl?: string | null;
-  className?: string;
+  xpToNext: number;
+  rankName?: string;
+  avatarUrl?: string;
 }
 
-export function RankCard({
+export default function RankCard({
   displayName,
   level,
   xp,
+  xpToNext,
   rankName,
   avatarUrl,
-  className,
 }: RankCardProps) {
-  // Calculate XP progress using configuration
-  const xpForCurrentLevel = XP_CONFIG.calculateXpForLevel(level);
-  const xpForNextLevel = XP_CONFIG.calculateXpForLevel(level + 1);
-  const xpInCurrentLevel = xp - xpForCurrentLevel;
-  const xpNeededForLevel = xpForNextLevel - xpForCurrentLevel;
-  const progressPercentage = Math.min((xpInCurrentLevel / xpNeededForLevel) * 100, 100);
+  // Calculate progress percentage
+  const totalXpForLevel = xp + xpToNext;
+  const progressPercentage = totalXpForLevel > 0 ? (xp / totalXpForLevel) * 100 : 0;
 
   return (
-    <div
-      className={cn(
-        'relative overflow-hidden rounded-2xl',
-        'bg-gradient-to-br from-slate-900/90 via-purple-900/50 to-slate-900/90',
-        'backdrop-blur-xl border border-white/10',
-        'shadow-2xl shadow-purple-500/20',
-        className
-      )}
-    >
-      {/* Noise texture overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.02] mix-blend-overlay"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-        }}
-      />
-
-      {/* Gradient mesh accent */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/20 to-pink-500/20 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-blue-500/20 to-cyan-500/20 blur-3xl rounded-full translate-y-1/2 -translate-x-1/2" />
-
-      <div className="relative z-10 p-8">
-        <div className="flex items-center gap-6 mb-6">
-          {/* Avatar */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full blur-lg opacity-50" />
-            <div className="relative w-24 h-24 rounded-full border-4 border-white/20 overflow-hidden bg-slate-800">
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={displayName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-white/50">
-                  {displayName.charAt(0).toUpperCase()}
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+      <div className="relative w-full max-w-2xl">
+        {/* Gradient mesh background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 rounded-3xl blur-3xl" />
+        
+        {/* Glass card */}
+        <div className="relative overflow-hidden rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
+          {/* Noise texture overlay */}
+          <div 
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 400 400\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' /%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' /%3E%3C/svg%3E")',
+              backgroundSize: '200px 200px',
+            }}
+          />
+          
+          {/* Content */}
+          <div className="relative p-8">
+            {/* Header */}
+            <div className="flex items-center gap-6 mb-8">
+              {/* Avatar */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full blur-xl opacity-50" />
+                <div className="relative w-24 h-24 rounded-full bg-white/10 border-2 border-white/20 overflow-hidden">
+                  {avatarUrl ? (
+                    <img 
+                      src={avatarUrl} 
+                      alt={displayName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white text-3xl font-bold bg-gradient-to-br from-purple-500 to-pink-500">
+                      {displayName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+              
+              {/* Name and rank */}
+              <div className="flex-1">
+                <h1 className="text-3xl font-bold text-white mb-2 truncate">
+                  {displayName}
+                </h1>
+                {rankName && (
+                  <p className="text-lg text-purple-300 font-medium">
+                    {rankName}
+                  </p>
+                )}
+              </div>
+              
+              {/* Level badge */}
+              <div className="flex flex-col items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
+                <span className="text-xs text-white/80 font-medium">LEVEL</span>
+                <span className="text-2xl font-bold text-white">{level}</span>
+              </div>
             </div>
-            {/* Level badge */}
-            <div className="absolute -bottom-2 -right-2 bg-gradient-to-br from-purple-600 to-pink-600 text-white text-sm font-bold px-3 py-1 rounded-full border-2 border-slate-900 shadow-lg">
-              {level}
-            </div>
-          </div>
-
-          {/* Name and rank */}
-          <div className="flex-1">
-            <h2 className="text-3xl font-bold text-white mb-1 drop-shadow-lg">
-              {displayName}
-            </h2>
-            {rankName && (
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30">
-                <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                <span className="text-sm font-semibold text-amber-200">
-                  {rankName}
+            
+            {/* Progress section */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-white/80">Experience</span>
+                <span className="text-white font-medium">
+                  {xp.toLocaleString()} / {totalXpForLevel.toLocaleString()} XP
                 </span>
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* XP Progress */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-slate-300 font-medium">Level {level}</span>
-            <span className="text-slate-400">
-              {xpInCurrentLevel.toLocaleString()} / {xpNeededForLevel.toLocaleString()} XP
-            </span>
-          </div>
-          
-          {/* Progress bar */}
-          <div className="relative h-3 bg-slate-800/50 rounded-full overflow-hidden border border-white/5">
-            <div
-              className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${progressPercentage}%` }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+              
+              {/* Progress bar */}
+              <div className="relative h-4 bg-white/5 rounded-full overflow-hidden border border-white/10">
+                <div 
+                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500 ease-out rounded-full"
+                  style={{ width: `${progressPercentage}%` }}
+                >
+                  <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                </div>
+              </div>
+              
+              <div className="text-right text-sm text-white/60">
+                {xpToNext.toLocaleString()} XP to next level
+              </div>
             </div>
-          </div>
-
-          {/* Total XP */}
-          <div className="flex justify-end">
-            <span className="text-xs text-slate-500">
-              Total: {xp.toLocaleString()} XP
-            </span>
           </div>
         </div>
       </div>

@@ -98,4 +98,5 @@ export const GAME_CONFIG = {
   MAX_PLAYERS: 8,
   MIN_PLAYERS: 1,
   ROOM_CODE_LENGTH: 6,
+  MAX_EVENT_VALUE: 1000, // Maximum points per single event
 };

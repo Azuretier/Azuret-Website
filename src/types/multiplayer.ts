@@ -1,42 +1,33 @@
-/**
- * WebSocket Multiplayer Message Protocol
- * Uses JSON messages with a 'type' field for routing
- */
-
-// Player in a multiplayer room
-export interface MultiplayerPlayer {
+// Player types
+export interface Player {
   id: string;
   name: string;
-  isHost: boolean;
-  isReady: boolean;
+  ready: boolean;
   connected: boolean;
 }
 
-// Room phases
-export enum RoomPhase {
-  LOBBY = 'lobby',
-  READY = 'ready',
-  PLAYING = 'playing',
-  FINISHED = 'finished',
-}
-
-// Room state
-export interface RoomStateData {
-  roomCode: string;
+// Room types
+export interface RoomState {
+  code: string;
+  name: string;
   hostId: string;
-  players: MultiplayerPlayer[];
-  phase: RoomPhase;
-  maxPlayers: number;
-  name?: string; // Optional display name for the room
-  createdAt?: number; // Timestamp when room was created
-  updatedAt?: number; // Timestamp when room was last updated
+  players: Player[];
+  status: 'waiting' | 'playing' | 'finished';
 }
 
-// Client to Server Messages
+export interface PublicRoomInfo {
+  code: string;
+  name: string;
+  hostName: string;
+  playerCount: number;
+}
+
+// Client -> Server messages
 export interface CreateRoomMessage {
   type: 'create_room';
   playerName: string;
-  roomName?: string; // Optional room name for display
+  roomName?: string;
+  isPublic?: boolean;
 }
 
 export interface JoinRoomMessage {
@@ -58,13 +49,28 @@ export interface StartGameMessage {
   type: 'start_game';
 }
 
-export interface RelayMessage {
-  type: 'relay';
-  payload: any; // Intentionally generic - games can send custom data structures
+export interface GetRoomsMessage {
+  type: 'get_rooms';
 }
 
-export interface ListRoomsMessage {
-  type: 'list_rooms';
+export interface RelayMessage {
+  type: 'relay';
+  payload: any;
+}
+
+export interface PongMessage {
+  type: 'pong';
+}
+
+export interface ReconnectMessage {
+  type: 'reconnect';
+  roomCode: string;
+  reconnectToken: string;
+}
+
+export interface SyncRequestMessage {
+  type: 'sync_request';
+  lastReceivedTimestamp: number;
 }
 
 export type ClientMessage =
@@ -73,36 +79,53 @@ export type ClientMessage =
   | LeaveRoomMessage
   | SetReadyMessage
   | StartGameMessage
+  | GetRoomsMessage
   | RelayMessage
-  | ListRoomsMessage;
+  | PongMessage
+  | ReconnectMessage
+  | SyncRequestMessage;
 
-// Server to Client Messages
+// Server -> Client messages
+export interface ConnectedMessage {
+  type: 'connected';
+  playerId: string;
+  serverTime?: number;
+}
+
 export interface RoomCreatedMessage {
   type: 'room_created';
   roomCode: string;
   playerId: string;
+  reconnectToken?: string;
 }
 
 export interface JoinedRoomMessage {
   type: 'joined_room';
   roomCode: string;
   playerId: string;
-  roomState: RoomStateData;
+  roomState: RoomState;
+  reconnectToken?: string;
 }
 
 export interface RoomStateMessage {
   type: 'room_state';
-  roomState: RoomStateData;
+  roomState: RoomState;
+}
+
+export interface RoomListMessage {
+  type: 'room_list';
+  rooms: PublicRoomInfo[];
 }
 
 export interface PlayerJoinedMessage {
   type: 'player_joined';
-  player: MultiplayerPlayer;
+  player: Player;
 }
 
 export interface PlayerLeftMessage {
   type: 'player_left';
   playerId: string;
+  reason?: string;
 }
 
 export interface PlayerReadyMessage {
@@ -113,12 +136,20 @@ export interface PlayerReadyMessage {
 
 export interface GameStartedMessage {
   type: 'game_started';
+  gameSeed?: number;
+  timestamp?: number;
 }
 
 export interface RelayedMessage {
   type: 'relayed';
   fromPlayerId: string;
-  payload: any; // Intentionally generic - games can send custom data structures
+  payload: any;
+  timestamp?: number;
+}
+
+export interface PingMessage {
+  type: 'ping';
+  timestamp: number;
 }
 
 export interface ErrorMessage {
@@ -127,42 +158,16 @@ export interface ErrorMessage {
   code?: string;
 }
 
-export interface ConnectedMessage {
-  type: 'connected';
-  playerId: string;
-}
-
-export interface RoomListMessage {
-  type: 'room_list';
-  rooms: RoomListItem[];
-}
-
-export interface RoomListItem {
-  roomCode: string;
-  name: string;
-  hostName: string;
-  playerCount: number;
-  maxPlayers: number;
-  status: 'open' | 'in_game';
-  createdAt: number;
-}
-
 export type ServerMessage =
+  | ConnectedMessage
   | RoomCreatedMessage
   | JoinedRoomMessage
   | RoomStateMessage
+  | RoomListMessage
   | PlayerJoinedMessage
   | PlayerLeftMessage
   | PlayerReadyMessage
   | GameStartedMessage
   | RelayedMessage
-  | ErrorMessage
-  | ConnectedMessage
-  | RoomListMessage;
-
-// Configuration
-export const MULTIPLAYER_CONFIG = {
-  MAX_PLAYERS: 8,
-  ROOM_CODE_LENGTH: 6,
-  DEFAULT_MAX_PLAYERS: 4,
-};
+  | PingMessage
+  | ErrorMessage;

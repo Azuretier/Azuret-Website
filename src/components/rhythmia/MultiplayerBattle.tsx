@@ -163,7 +163,7 @@ export const MultiplayerBattle: React.FC<Props> = ({
 
   // ===== WebSocket =====
   const connectWebSocket = useCallback(() => {
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001';
+    const wsUrl = process.env.NEXT_PUBLIC_MULTIPLAYER_URL || 'ws://localhost:3001';
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {

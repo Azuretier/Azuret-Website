@@ -62,6 +62,11 @@ export default function MultiplayerGame() {
   useEffect(() => {
     if (!auth) return;
     
+    // Sign in anonymously first
+    signInAnonymously(auth).catch((error) => {
+      console.error('Authentication error:', error);
+    });
+    
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         playerIdRef.current = user.uid;
@@ -84,9 +89,6 @@ export default function MultiplayerGame() {
         return;
       }
       setConnectionStatus('connecting');
-      
-      // Sign in anonymously first
-      await signInAnonymously(auth);
       
       // Test Firebase connection with a simple query
       const testQuery = query(collection(db, 'rhythmia_rooms'));

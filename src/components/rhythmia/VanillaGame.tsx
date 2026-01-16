@@ -282,15 +282,20 @@ export const Rhythmia: React.FC = () => {
       }
     });
 
+    // Helper function to complete board by adding empty rows at the top
+    const completeBoard = (partialBoard: (PieceCell | null)[][]) => {
+      const completed = [...partialBoard];
+      while (completed.length < H) {
+        completed.unshift(Array(W).fill(null));
+      }
+      return completed;
+    };
+
     // Prepare the board state for collision check
     let boardForCollisionCheck = newBoard;
     if (cleared > 0) {
       // Complete the remaining board by adding empty rows at the top
-      const completedRemainingBoard = [...remainingBoard];
-      while (completedRemainingBoard.length < H) {
-        completedRemainingBoard.unshift(Array(W).fill(null));
-      }
-      boardForCollisionCheck = completedRemainingBoard;
+      boardForCollisionCheck = completeBoard(remainingBoard);
 
       setClearingRows(rowsToClear);
       setBoard(newBoard);
@@ -325,8 +330,9 @@ export const Rhythmia: React.FC = () => {
         setTimeout(() => setBoardShake(false), 200);
 
         setClearingRows([]);
-        setBoard(completedRemainingBoard);
-        boardStateRef.current = completedRemainingBoard;
+        const completedBoard = completeBoard(remainingBoard);
+        setBoard(completedBoard);
+        boardStateRef.current = completedBoard;
       }, 300);
     } else {
       setBoard(newBoard);

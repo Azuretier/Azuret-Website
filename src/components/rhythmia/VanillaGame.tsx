@@ -424,8 +424,6 @@ export const Rhythmia: React.FC = () => {
     setShowGameOver(false);
     setGameStarted(true);
     setClearingRows([]);
-
-    lastBeatRef.current = Date.now();
   }, [initAudio, randomPiece]);
 
   // ===== Effects =====
@@ -452,8 +450,11 @@ export const Rhythmia: React.FC = () => {
     const world = WORLDS[worldIdx];
     const interval = 60000 / world.bpm;
 
+    // Initialize lastBeatRef to now so the phase calculation starts correctly
+    lastBeatRef.current = Date.now();
+
     beatTimerRef.current = window.setInterval(() => {
-      lastBeatRef.current = Date. now();
+      lastBeatRef.current = Date.now();
       setBoardBeat(true);
       playDrum();
       setTimeout(() => setBoardBeat(false), 100);

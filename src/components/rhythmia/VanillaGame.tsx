@@ -227,6 +227,14 @@ export const Rhythmia: React.FC = () => {
     playTone(131, 0.5, 'sawtooth');
   }, [playTone]);
 
+  const completeBoard = useCallback((partialBoard: (PieceCell | null)[][]) => {
+    const completed = [...partialBoard];
+    while (completed.length < H) {
+      completed.unshift(Array(W).fill(null));
+    }
+    return completed;
+  }, []);
+
   const lock = useCallback(() => {
     const currentPiece = pieceRef.current;
     const currentPos = piecePosRef.current;
@@ -281,15 +289,6 @@ export const Rhythmia: React.FC = () => {
         remainingBoard.push(row);
       }
     });
-
-    // Helper function to complete board by adding empty rows at the top
-    const completeBoard = (partialBoard: (PieceCell | null)[][]) => {
-      const completed = [...partialBoard];
-      while (completed.length < H) {
-        completed.unshift(Array(W).fill(null));
-      }
-      return completed;
-    };
 
     // Prepare the board state for collision check
     let boardForCollisionCheck = newBoard;
@@ -353,7 +352,7 @@ export const Rhythmia: React.FC = () => {
     if (currentNextPiece && collision(currentNextPiece, newPos.x, newPos.y, boardForCollisionCheck)) {
       endGame();
     }
-  }, [nextPiece, showJudgment, playTone, spawnParticles, randomPiece, collision, updateScore, nextWorld, playLineClear, endGame]);
+  }, [nextPiece, showJudgment, playTone, spawnParticles, randomPiece, collision, updateScore, nextWorld, playLineClear, endGame, completeBoard]);
 
   const move = useCallback((dx: number, dy: number) => {
     if (gameOverRef.current || !pieceRef.current) return;

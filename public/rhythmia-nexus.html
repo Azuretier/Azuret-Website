@@ -3726,6 +3726,7 @@
                     break;
 
                 case 'room_list':
+                    console.log('[WS] Received room list:', msg.rooms?.length || 0, 'rooms');
                     renderRoomList(msg.rooms);
                     break;
 
@@ -3769,6 +3770,9 @@
                 case 'error':
                     showError(msg.message);
                     break;
+                
+                default:
+                    console.warn('[WS] Unhandled message type:', msg.type);
             }
         }
 
@@ -3917,6 +3921,7 @@
             const listEl = document.getElementById('roomList');
             listEl.innerHTML = '<div class="room-list-empty">ルームを検索中...</div>';
             
+            console.log('[WS] Requesting room list...');
             // Request room list from server
             sendMessage({ type: 'get_rooms' });
         }

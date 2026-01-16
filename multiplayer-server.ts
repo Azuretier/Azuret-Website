@@ -377,6 +377,7 @@ function handleMessage(playerId: string, data: string): void {
 
       case 'get_rooms': {
         const publicRooms = roomManager.getPublicRooms();
+        console.log(`[GET_ROOMS] Player ${playerId} requesting room list (${publicRooms.length} public rooms)`);
         sendToPlayer(playerId, {
           type: 'room_list',
           rooms: publicRooms,
@@ -427,6 +428,7 @@ function handleMessage(playerId: string, data: string): void {
       }
 
       default:
+        console.warn(`[WARN] Unknown message type from player ${playerId}:`, (message as any).type);
         sendError(playerId, `Unknown message type: ${(message as any).type}`, 'UNKNOWN_TYPE');
     }
   } catch (error) {

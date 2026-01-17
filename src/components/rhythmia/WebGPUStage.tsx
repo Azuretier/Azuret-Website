@@ -122,7 +122,8 @@ export default function WebGPUStage() {
             
             // Heartbeat/rhythm pulse (60-120 BPM range)
             let bpm = 90.0;
-            let beatTime = time * (bpm / 60.0);
+            let beatsPerSecond = 1.5; // 90 / 60
+            let beatTime = time * beatsPerSecond;
             let pulse = sin(beatTime * 6.28318) * 0.5 + 0.5;
             let strongPulse = pow(pulse, 3.0);
             

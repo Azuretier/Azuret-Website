@@ -676,7 +676,7 @@ export const Rhythmia: React.FC = () => {
     animFrame = requestAnimationFrame(updateBeat);
 
     return () => cancelAnimationFrame(animFrame);
-  }, [gameStarted, gameOver]);
+  }, [gameStarted, worldIdx, gameOver]);
 
   // Keyboard controls
   useEffect(() => {

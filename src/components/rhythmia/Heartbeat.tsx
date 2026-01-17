@@ -137,7 +137,7 @@ fn aurora(p: vec2<f32>, t: f32) -> vec3<f32> {
   let wave1 = sin(p.x * 3.0 + t * 0.5 + fbm(p * 2.0 + t * 0.1) * 2.0) * 0.5 + 0.5;
   let wave2 = sin(p.x * 5.0 - t * 0.7 + fbm(p * 3.0 - t * 0.15) * 1.5) * 0.5 + 0.5;
   
-  let intensity = smoothstep(0.3, 0.7, wave1) * smoothstep(0.2, 0.6, wave2);
+  var intensity = smoothstep(0.3, 0.7, wave1) * smoothstep(0.2, 0.6, wave2);
   intensity = intensity * smoothstep(-0.2, 0.3, p.y) * smoothstep(0.8, 0.4, p.y);
   
   let col1 = vec3<f32>(0.0, 1.0, 0.5);

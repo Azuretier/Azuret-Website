@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './MultiplayerBattle.module.css';
+import type { GameAction, TickInputsMessage, GameResyncMessage } from '@/types/multiplayer';
 
 // ===== Types =====
 interface PieceCell {
@@ -88,6 +89,7 @@ export const MultiplayerBattle: React.FC<Props> = ({
   const [showJudgmentAnim, setShowJudgmentAnim] = useState(false);
   const [clearingRows, setClearingRows] = useState<number[]>([]);
   const [pendingGarbage, setPendingGarbage] = useState(0);
+  const [currentTick, setCurrentTick] = useState(0);
 
   // Refs
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -96,6 +98,7 @@ export const MultiplayerBattle: React.FC<Props> = ({
   const beatTimerRef = useRef<number | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const cellSizeRef = useRef(20);
+  const currentTickRef = useRef(0);
 
   // Refs for current state
   const pieceRef = useRef(piece);
@@ -122,6 +125,7 @@ export const MultiplayerBattle: React.FC<Props> = ({
   useEffect(() => { linesRef.current = lines; }, [lines]);
   useEffect(() => { beatPhaseRef.current = beatPhase; }, [beatPhase]);
   useEffect(() => { pendingGarbageRef.current = pendingGarbage; }, [pendingGarbage]);
+  useEffect(() => { currentTickRef.current = currentTick; }, [currentTick]);
 
   // ===== Audio =====
   const initAudio = useCallback(() => {
@@ -180,19 +184,30 @@ export const MultiplayerBattle: React.FC<Props> = ({
       try {
         const message = JSON.parse(event.data);
         
-        if (message.type === 'relayed' && message.fromPlayerId !== playerId) {
+        // Handle tick_inputs - authoritative server inputs
+        if (message.type === 'tick_inputs') {
+          const tickMsg = message as TickInputsMessage;
+          handleTickInputs(tickMsg);
+        } 
+        // Handle resync message
+        else if (message.type === 'game_resync') {
+          const resyncMsg = message as GameResyncMessage;
+          handleResync(resyncMsg);
+        }
+        // Fallback to old relay protocol for backward compatibility
+        else if (message.type === 'relayed' && message.fromPlayerId !== playerId) {
           const payload = message.payload;
           
           if (payload.type === 'game_state') {
-            // Update opponent's board
+            // Update opponent's board (fallback)
             setOpponentBoard(payload.board);
             setOpponentScore(payload.score);
             setOpponentLines(payload.lines);
           } else if (payload.type === 'garbage') {
-            // Receive garbage from opponent
+            // Receive garbage from opponent (fallback)
             setPendingGarbage(prev => prev + payload.count);
           } else if (payload.type === 'game_over') {
-            // Opponent lost - we win!
+            // Opponent lost - we win! (fallback)
             handleGameEnd(playerId);
           }
         }
@@ -217,7 +232,49 @@ export const MultiplayerBattle: React.FC<Props> = ({
     };
   }, [playerId]);
 
+  // Send input to server for current tick
+  const sendInput = useCallback((actions: GameAction[]) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        type: 'input',
+        tick: currentTickRef.current,
+        actions,
+      }));
+    }
+  }, []); // currentTickRef is a ref, so it's safe to omit from dependencies
+
+  // Request resync from server
+  const requestResync = useCallback(() => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        type: 'game_resync_request',
+      }));
+    }
+  }, []);
+
+  // Handle tick inputs from server
+  const handleTickInputs = useCallback((tickMsg: TickInputsMessage) => {
+    // Process inputs for all players simultaneously
+    const { tick, inputs } = tickMsg;
+    
+    // Note: Full deterministic opponent simulation requires refactoring
+    // game logic to be pure/stateless. For now, we rely on the relay
+    // fallback (sendGameState) to sync opponent's board state.
+    // Future improvement: implement deterministic replay of opponent inputs.
+
+    // Update current tick
+    setCurrentTick(tick + 1);
+  }, []);
+
+  // Handle resync message from server
+  const handleResync = useCallback((resyncMsg: GameResyncMessage) => {
+    console.log('[RESYNC] Received tick', resyncMsg.currentTick);
+    setCurrentTick(resyncMsg.currentTick);
+    // Could replay tick history here if needed
+  }, []);
+
   const sendGameState = useCallback((state: Partial<GameState>) => {
+    // Keep this for backward compatibility / fallback
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         type: 'relay',
@@ -454,10 +511,17 @@ export const MultiplayerBattle: React.FC<Props> = ({
       setPiecePos(newPos);
       piecePosRef.current = newPos;
       if (dx !== 0) playTone(392, 0.05, 'square');
+      
+      // Send input to server
+      if (dx !== 0) {
+        sendInput([{ type: 'move', direction: dx < 0 ? 'left' : 'right' }]);
+      } else if (dy > 0) {
+        sendInput([{ type: 'move', direction: 'down' }]);
+      }
     } else if (dy > 0) {
       lock();
     }
-  }, [collision, playTone, lock]);
+  }, [collision, playTone, lock, sendInput]);
 
   const rotatePiece = useCallback(() => {
     if (gameOverRef.current || !pieceRef.current) return;
@@ -471,8 +535,11 @@ export const MultiplayerBattle: React.FC<Props> = ({
       setPiece(rotated);
       pieceRef.current = rotated;
       playTone(523, 0.08);
+      
+      // Send input to server
+      sendInput([{ type: 'rotate' }]);
     }
-  }, [rotate, collision, playTone]);
+  }, [rotate, collision, playTone, sendInput]);
 
   const hardDrop = useCallback(() => {
     if (gameOverRef.current || !pieceRef.current) return;
@@ -488,8 +555,12 @@ export const MultiplayerBattle: React.FC<Props> = ({
     setPiecePos(currentPos);
     piecePosRef.current = currentPos;
     playTone(196, 0.1, 'sawtooth');
+    
+    // Send input to server
+    sendInput([{ type: 'hard_drop' }]);
+    
     setTimeout(lock, 30);
-  }, [collision, playTone, lock]);
+  }, [collision, playTone, lock, sendInput]);
 
   // ===== Initialize Game =====
   const initGame = useCallback(() => {
@@ -518,6 +589,8 @@ export const MultiplayerBattle: React.FC<Props> = ({
     setClearingRows([]);
     setPendingGarbage(0);
     pendingGarbageRef.current = 0;
+    setCurrentTick(0);
+    currentTickRef.current = 0;
 
     // Initialize opponent board
     setOpponentBoard(Array(H).fill(null).map(() => Array(W).fill(null)));
@@ -526,7 +599,7 @@ export const MultiplayerBattle: React.FC<Props> = ({
 
     lastBeatRef.current = Date.now();
 
-    // Send initial state
+    // Send initial state (fallback for old protocol)
     setTimeout(() => {
       sendGameState({ board: initialBoard, score: 0, lines: 0 });
     }, 100);

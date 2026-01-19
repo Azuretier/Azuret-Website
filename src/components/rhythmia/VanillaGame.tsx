@@ -38,8 +38,8 @@ const SHAPES = [
   [[1, 1, 1, 1]],        // I
   [[1, 1], [1, 1]],      // O
   [[0, 1, 0], [1, 1, 1]], // T
-  [[0, 1, 1], [1, 1, 0]], // S
-  [[1, 1, 0], [0, 1, 1]], // Z
+  [[0, 1, 1], [1, 1, 0], [0, 0, 0]], // S - 3x3 for proper center rotation
+  [[1, 1, 0], [0, 1, 1], [0, 0, 0]], // Z - 3x3 for proper center rotation
   [[1, 0, 0], [1, 1, 1]], // L
   [[0, 0, 1], [1, 1, 1]], // J
 ];
@@ -235,9 +235,11 @@ export const Rhythmia: React.FC = () => {
   }, []);
 
   const rotateCCW = useCallback((p: Piece): Piece => {
+    const newRotation = ((p.rotation - 1 + 4) % 4) as 0 | 1 | 2 | 3;
     return {
       ...p,
       shape: p.shape[0].map((_, i) => p.shape.map(row => row[row.length - 1 - i])),
+      rotation: newRotation,
     };
   }, []);
 
@@ -291,20 +293,29 @@ export const Rhythmia: React.FC = () => {
   // A T-Spin is detected when:
   // 1. The piece is a T piece
   // 2. The last action was a successful rotation
-  // 3. At least 3 of the 4 corner cells around the T's center are filled or out of bounds
+  // 3. At least 3 of the 4 corner cells around the T's bottom center are filled or out of bounds
   const checkTSpin = useCallback((piece: Piece, pos: { x: number; y: number }, board: (PieceCell | null)[][]): 'full' | 'mini' | null => {
     if (piece.type !== 'T' || !lastRotationRef.current) {
       return null;
     }
 
-    // Find the center of the T piece by looking for the cell that has 3 neighbors
-    // In a T piece, the center is the only cell with 3 filled neighbors
+    // Find the bottom center of the T piece for T-spin detection
+    // The T piece rotates around its bottom axis
+    // We find the center cell (the one with 3 neighbors) and use its position
+    // but for T-spin corner checks, we use the bottom row's center as the axis
     let centerX = -1;
     let centerY = -1;
+    let bottomY = -1;
     
+    // First, find the geometric center (cell with 3 neighbors)
     for (let py = 0; py < piece.shape.length; py++) {
       for (let px = 0; px < piece.shape[py].length; px++) {
         if (piece.shape[py][px]) {
+          // Track the bottommost row with filled cells
+          if (pos.y + py > bottomY) {
+            bottomY = pos.y + py;
+          }
+          
           // Count neighbors
           let neighbors = 0;
           // Check up, down, left, right
@@ -317,11 +328,14 @@ export const Rhythmia: React.FC = () => {
           if (neighbors === 3) {
             centerX = pos.x + px;
             centerY = pos.y + py;
-            break;
           }
         }
       }
-      if (centerX !== -1) break;
+    }
+    
+    // Use the center X but bottom Y for T-spin axis
+    if (centerX !== -1 && bottomY !== -1) {
+      centerY = bottomY;
     }
     
     if (centerX === -1) return null; // Couldn't find center

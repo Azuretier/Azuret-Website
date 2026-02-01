@@ -89,7 +89,7 @@ export default function RhythmiaPage() {
       {/* Particle System Background */}
       <ParticleSystem />
       
-      {/* CSS Fallback Background effects (for browsers without WebGPU) */}
+      {/* CSS Fallback Background effects */}
       <div className={styles.bgGrid}></div>
       <div className={`${styles.bgGlow} ${styles.glow1}`}></div>
       <div className={`${styles.bgGlow} ${styles.glow2}`}></div>

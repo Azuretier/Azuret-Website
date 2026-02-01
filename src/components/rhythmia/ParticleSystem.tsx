@@ -83,7 +83,6 @@ export default function ParticleSystem() {
     const render = () => {
       if (!mounted || !ctx || !canvas) return;
 
-      const elapsed = (Date.now() - startTimeRef.current) / 1000;
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
 

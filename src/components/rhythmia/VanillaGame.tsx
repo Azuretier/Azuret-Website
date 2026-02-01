@@ -830,7 +830,7 @@ export const Rhythmia: React.FC = () => {
   const getWorldName = useCallback((idx: number) => {
     const worldKeys = ['melodia', 'harmonia', 'crescenda', 'fortissimo', 'silence'];
     return t.worlds[worldKeys[idx] as keyof typeof t.worlds] || WORLDS[idx].name;
-  }, [t]);
+  }, [t, language]);
 
   const world = WORLDS[worldIdx];
   const displayBoard = getDisplayBoard();

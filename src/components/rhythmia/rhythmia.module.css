@@ -1,19 +1,20 @@
-/* Honkai Star Rail Theme Colors */
-:root {
+/* Honkai Star Rail Theme */
+.page {
+  /* HSR Color variables */
   --hsr-gold: #f4c430;
   --hsr-amber: #ffb347;
   --hsr-purple: #9370db;
   --hsr-cosmic-blue: #4169e1;
   --hsr-dark-purple: #2d1b4e;
+  
+  /* Legacy variable names for compatibility */
   --dark-bg: #0d0620;
   --darker-bg: #070313;
-  --neon-pink: #f4c430;
-  --neon-cyan: #4169e1;
-  --neon-purple: #9370db;
-  --neon-gold: #f4c430;
-}
-
-.page {
+  --neon-pink: #f4c430;      /* Maps to HSR gold */
+  --neon-cyan: #4169e1;      /* Maps to HSR cosmic blue */
+  --neon-purple: #9370db;    /* Maps to HSR purple */
+  --neon-gold: #f4c430;      /* Maps to HSR gold */
+  
   font-family: 'Zen Kaku Gothic New', sans-serif;
   background: var(--dark-bg);
   min-height: 100vh;

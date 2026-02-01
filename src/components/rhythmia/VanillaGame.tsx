@@ -845,7 +845,7 @@ export const Rhythmia: React.FC = () => {
           <p>{t.subtitle}</p>
           
           {/* Language Selection */}
-          <div style={{ marginTop: '20px' }}>
+          <div className={styles.languageSelectorContainer}>
             <div className={styles.langLabel}>{t.selectLanguage}</div>
             <div className={styles.languageSelector}>
               <button
